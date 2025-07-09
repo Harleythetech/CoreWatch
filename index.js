@@ -9,7 +9,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
 
@@ -173,20 +173,18 @@ async function getSystemInfo() {
             cpuRealSpeed = 0;
         }
 
+        // First, collect the essential data that rarely fails
         const [
             cpu,
             cpuCurrentSpeed,
             cpuTemperature,
             mem,
             processes,
-            fsSize,
-            osInfo, // This should get osInfo data
-            timeInfo, // Add this for the si.time() call
+            osInfo,
+            timeInfo,
             networkInterfaces,
             networkStats,
-            networkConnections,
-            users,
-            services
+            networkConnections
         ] = await Promise.all([
             // Basic metrics with simplified error handling
             promiseWithTimeout(si.currentLoad().catch(() => ({ currentLoad: 0, avgLoad: 0, cpus: [] })), 5000),
@@ -206,11 +204,6 @@ async function getSystemInfo() {
                 }))
             })).catch(() => ({ all: 0, running: 0, list: [] })), 5000),
             
-            // Storage with error handling
-            promiseWithTimeout(si.fsSize().then(fsData => {
-                return fsData;
-            }).catch(() => ([])), 5000),
-            
             // System info - Fix this line
             promiseWithTimeout(si.osInfo().catch(() => ({ hostname: 'Unknown', platform: 'Unknown', kernel: 'Unknown', arch: 'Unknown', uptime: 0 })), 5000),
             Promise.resolve((() => {
@@ -222,14 +215,62 @@ async function getSystemInfo() {
             })()), // Fix: si.time() is synchronous, wrap it properly
             
             // Network data
-            promiseWithTimeout(si.networkInterfaces().catch(() => ([])), 5000), // Remove .slice(0, 3)
-            promiseWithTimeout(si.networkStats().catch(() => ([])), 5000), // Remove .slice(0, 3) 
-            promiseWithTimeout(si.networkConnections().then(conns => conns.slice(0, 10)).catch(() => ([])), 5000), // Keep connection limit but increase it
-            
-            // Additional data for full collection
-            promiseWithTimeout(si.users().catch(() => ([])), 5000),
-            promiseWithTimeout(si.services('*').then(svcs => svcs.slice(0, 10)).catch(() => ([])), 5000)
+            promiseWithTimeout(si.networkInterfaces().catch(() => ([])), 5000),
+            promiseWithTimeout(si.networkStats().catch(() => ([])), 5000),
+            promiseWithTimeout(si.networkConnections().then(conns => conns.slice(0, 10)).catch(() => ([])), 5000)
         ]);
+
+        // Now try to get the problematic data separately with better error handling
+        let fsSize = [];
+        let users = [];
+        let services = [];
+
+        // Storage data - handle separately with longer timeout
+        try {
+            fsSize = await promiseWithTimeout(
+                si.fsSize().catch(() => []), 
+                8000 // Longer timeout for storage
+            );
+        } catch (error) {
+            console.warn('Storage data collection failed:', error.message);
+            fsSize = [];
+        }
+
+        // Users data - handle separately
+        try {
+            users = await promiseWithTimeout(
+                si.users().catch(() => []), 
+                3000
+            );
+        } catch (error) {
+            console.warn('Users data collection failed:', error.message);
+            users = [];
+        }
+
+        // Services data - handle separately with better filtering
+        try {
+            const allServices = await promiseWithTimeout(
+                si.services('*').catch(() => []), 
+                8000 // Longer timeout for services
+            );
+            
+            // Filter services more efficiently
+            services = (allServices || [])
+                .filter(service => {
+                    if (!service || !service.name) return false;
+                    
+                    const serviceName = service.name.toLowerCase();
+                    return developerServices.some(devService => 
+                        serviceName.includes(devService.toLowerCase()) || 
+                        serviceName.startsWith(devService.toLowerCase())
+                    );
+                })
+                .slice(0, 20);
+                
+        } catch (error) {
+            console.warn('Services data collection failed:', error.message);
+            services = [];
+        }
 
         const cpuCores = (cpu.cpus || []).map((core, index) => {
             let coreSpeed = 0;
@@ -254,7 +295,7 @@ async function getSystemInfo() {
             used: Math.round((mem.used || 0) / 1024 / 1024 / 1024 * 100) / 100, // GB
             free: Math.round((mem.free || 0) / 1024 / 1024 / 1024 * 100) / 100, // GB
             available: Math.round((mem.available || 0) / 1024 / 1024 / 1024 * 100) / 100, // GB
-            cached: Math.round((mem.cached || 0) / 1024 / 1024 / 1024 * 100) / 100, // Add this line
+            cached: Math.round((mem.cached || 0) / 1024 / 1024 / 1024 * 100) / 100,
             usedPercent: Math.round(((mem.used || 0) / (mem.total || 1)) * 100 * 100) / 100,
             swapTotal: Math.round((mem.swaptotal || 0) / 1024 / 1024 / 1024 * 100) / 100, // GB
             swapUsed: Math.round((mem.swapused || 0) / 1024 / 1024 / 1024 * 100) / 100, // GB
@@ -274,7 +315,6 @@ async function getSystemInfo() {
                 use: Math.round((fs.use || 0) * 100) / 100
             };
         });
-
 
         // Enhanced process data - highly simplified
         const allProcesses = (processes.list || []);
@@ -395,33 +435,14 @@ async function getSystemInfo() {
         }));
 
         // Services health (filtered for developer/tech enthusiast services)
-        const serviceHealth = (services || [])
-            .filter(service => {
-                if (!service || !service.name) return false;
-                
-                // Check if service name contains any of our developer services
-                const serviceName = service.name.toLowerCase();
-                return developerServices.some(devService => 
-                    serviceName.includes(devService.toLowerCase()) || 
-                    serviceName.startsWith(devService.toLowerCase()) ||
-                    // Special cases for common patterns
-                    (serviceName.includes('node') && serviceName.includes('js')) ||
-                    (serviceName.includes('pm2')) ||
-                    (serviceName.includes('docker')) ||
-                    (serviceName.includes('nginx')) ||
-                    (serviceName.includes('mysql')) ||
-                    (serviceName.includes('postgres'))
-                );
-            })
-            .slice(0, 20) // Show up to 20 developer services
-            .map(service => ({
-                name: service.name || 'Unknown',
-                running: service.running || false,
-                startmode: service.startmode || 'Unknown',
-                pids: service.pids || [],
-                cpu: service.cpu || 0,
-                mem: service.mem || 0
-            }));
+        const serviceHealth = (services || []).map(service => ({
+            name: service.name || 'Unknown',
+            running: service.running || false,
+            startmode: service.startmode || 'Unknown',
+            pids: service.pids || [],
+            cpu: service.cpu || 0,
+            mem: service.mem || 0
+        }));
 
         return {
             cpu: {
@@ -461,7 +482,7 @@ async function getSystemInfo() {
                 used: 0,
                 free: 0,
                 available: 0,
-                cached: 0, // Add this line
+                cached: 0,
                 usedPercent: 0, 
                 swapUsedPercent: 0,
                 swapTotal: 0,

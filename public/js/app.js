@@ -13,6 +13,12 @@ class SystemMonitor {
     setupEventListeners() {
         this.socket.on('systemData', (data) => {
             try {
+                // Add debugging to see what data we're receiving
+                console.log('Received data keys:', Object.keys(data));
+                if (data.storage) console.log('Storage items:', data.storage.length);
+                if (data.users) console.log('Users items:', data.users.length);
+                if (data.services) console.log('Services items:', data.services.length);
+                
                 this.updateUI(data);
             } catch (error) {
                 console.error('Error processing system data:', error);
@@ -107,9 +113,12 @@ class SystemMonitor {
             if (data.memory && typeof data.memory === 'object') {
                 this.updateMemory(this.lastData.memory);
             }
-            if (data.storage && Array.isArray(data.storage)) {
+            
+            // Fix: Only update storage if we actually received storage data
+            if (data.storage && Array.isArray(data.storage) && data.storage.length > 0) {
                 this.updateStorage(this.lastData.storage);
             }
+            
             if (data.processes && data.processes.top && Array.isArray(data.processes.top) && data.processes.top.length > 0) {
                 this.updateProcesses(this.lastData.processes);
             }
@@ -118,12 +127,17 @@ class SystemMonitor {
                 if (data.network.stats && Array.isArray(data.network.stats)) this.updateNetworkStats(this.lastData.network.stats);
                 if (data.network.connections && Array.isArray(data.network.connections)) this.updateNetworkConnections(this.lastData.network.connections);
             }
-            if (data.users && Array.isArray(data.users)) {
+            
+            // Fix: Only update users if we actually received users data
+            if (data.users && Array.isArray(data.users) && data.users.length >= 0) {
                 this.updateUsers(this.lastData.users);
             }
-            if (data.services && Array.isArray(data.services)) {
+            
+            // Fix: Only update services if we actually received services data
+            if (data.services && Array.isArray(data.services) && data.services.length >= 0) {
                 this.updateServices(this.lastData.services);
             }
+            
             if (data.systemInfo && typeof data.systemInfo === 'object' && Object.keys(data.systemInfo).length > 0) {
                 this.updateSystemInfo(this.lastData.systemInfo);
             }
@@ -149,10 +163,20 @@ class SystemMonitor {
 
         // Update top-level properties that exist in newData
         Object.keys(newData).forEach(key => {
-            if (typeof newData[key] === 'object' && newData[key] !== null) {
-                merged[key] = { ...merged[key], ...newData[key] };
-            } else {
-                merged[key] = newData[key];
+            // Only update if the new data actually contains meaningful content
+            if (newData[key] !== null && newData[key] !== undefined) {
+                if (Array.isArray(newData[key])) {
+                    // For arrays, only update if the new array has content or is explicitly empty
+                    if (newData[key].length > 0 || 
+                        (key === 'users' || key === 'services' || key === 'storage')) {
+                        merged[key] = newData[key];
+                    }
+                    // If array is empty and we have existing data, keep existing data
+                } else if (typeof newData[key] === 'object' && newData[key] !== null) {
+                    merged[key] = { ...merged[key], ...newData[key] };
+                } else {
+                    merged[key] = newData[key];
+                }
             }
         });
 
@@ -324,8 +348,17 @@ class SystemMonitor {
         const container = document.getElementById('storageList');
         if (!container) return;
 
-        if (!Array.isArray(storage) || storage.length === 0) {
-            container.innerHTML = '<div class="text-muted text-center">No storage devices detected</div>';
+        // If we have no storage data, don't clear existing content
+        if (!Array.isArray(storage)) {
+            console.warn('Storage data is not an array:', storage);
+            return;
+        }
+
+        if (storage.length === 0) {
+            // Only show "no devices" if we've never had storage data before
+            if (!container.innerHTML || container.innerHTML.includes('No storage devices detected')) {
+                container.innerHTML = '<div class="text-muted text-center">No storage devices detected</div>';
+            }
             return;
         }
 
@@ -515,8 +548,17 @@ class SystemMonitor {
         const container = document.getElementById('usersList');
         if (!container) return;
 
-        if (!Array.isArray(users) || users.length === 0) {
-            container.innerHTML = '<div class="text-muted text-center">No logged users</div>';
+        // If we have no users data, don't clear existing content
+        if (!Array.isArray(users)) {
+            console.warn('Users data is not an array:', users);
+            return;
+        }
+
+        if (users.length === 0) {
+            // Only show "no users" if we've never had users data before
+            if (!container.innerHTML || container.innerHTML.includes('No logged users')) {
+                container.innerHTML = '<div class="text-muted text-center">No logged users</div>';
+            }
             return;
         }
 
@@ -541,8 +583,17 @@ class SystemMonitor {
         const container = document.getElementById('servicesList');
         if (!container) return;
 
-        if (!Array.isArray(services) || services.length === 0) {
-            container.innerHTML = '<div class="text-muted text-center">No services detected</div>';
+        // If we have no services data, don't clear existing content
+        if (!Array.isArray(services)) {
+            console.warn('Services data is not an array:', services);
+            return;
+        }
+
+        if (services.length === 0) {
+            // Only show "no services" if we've never had services data before
+            if (!container.innerHTML || container.innerHTML.includes('No services detected')) {
+                container.innerHTML = '<div class="text-muted text-center">No services detected</div>';
+            }
             return;
         }
 
@@ -761,7 +812,6 @@ class SystemMonitor {
         else if (value < 50) badgeClass = 'bg-warning';
         else badgeClass = 'bg-danger';
 
-        console.log(`CPU Badge for ${value}%: ${badgeClass}`); // Debug log
         return badgeClass;
     }
 
@@ -774,7 +824,6 @@ class SystemMonitor {
     }
 
     getProcessStateBadgeClass(state) {
-        console.log('Process state received:', state); // Debug log
         switch (state.toLowerCase()) {
             case 'running':
             case 'r':
@@ -789,7 +838,6 @@ class SystemMonitor {
             case 't':
                 return 'bg-warning';
             default:
-                console.log('Unknown process state, using bg-secondary:', state); // Debug log
                 return 'bg-secondary';
         }
     }
@@ -806,7 +854,6 @@ class SystemMonitor {
             case 'close_wait':
                 return 'bg-danger';
             default:
-                console.log('Unknown connection state, using bg-secondary:', state); // Debug log
                 return 'bg-secondary';
         }
     }
