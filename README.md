@@ -3,7 +3,7 @@
 ### <p align="center">CoreWatch - System monitoring reimagined</p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.0.0--build.1--release-blue?style=for-the-badge" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.1.0--build.2--release-blue?style=for-the-badge" alt="Version">
   <img src="https://img.shields.io/badge/Node.js-16+-green?style=for-the-badge&logo=node.js" alt="Node.js">
   <img src="https://img.shields.io/badge/License-AGPL--3.0-red?style=for-the-badge" alt="License">
   <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey?style=for-the-badge" alt="Platform">
