@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoreWatch</title>
+
+    <!-- Preload fonts for better performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body data-bs-theme="light">
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid px-5">
+            <a class="navbar-brand" href="#">
+                <img src="/assets/cpu.png" alt="CoreWatch Logo" class="img-fluid" style="max-width: 50px;">
+                <div class="mb-0">
+                    <h3 class="mb-0 fs-4 font-monospace">CoreWatch</h3>
+                    <p class="small-font mb-0 mt-n4">V<%= version %></p>
+                </div>
+            </a>
+            <div class="navbar-nav ms-auto">
+                <div class="theme-toggle-container me-3">
+                    <div class="nav-item">
+                        <a class="nav-link" href="https://github.com/Harleythetech/CoreWatch" target="_blank">
+                            <i class=" bi bi-github theme-icon"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="theme-toggle-container">
+                    <i class="bi bi-sun-fill theme-icon"></i>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input border-danger-subtle" type="checkbox" id="themeToggle">
+                    </div>
+                    <i class="bi bi-moon-fill theme-icon"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid p-4">
+        <div class="row h-100">
+            <!-- Main Content Column -->
+            <div class="col-lg-8">
+                <div class="main-content">
+                    <!-- CPU Panel -->
+                    <div class="content-panel mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-cpu-fill"></i> CPU Metrics
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="cpu-metrics-grid">
+                                    <div class="metric-card text-center">
+                                        <div class="metric-value" id="avgCpuLoad">0%</div>
+                                        <div class="metric-label">Load</div>
+                                    </div>
+                                    <div class="metric-card text-center">
+                                        <div class="metric-value" id="cpuTemp">0°C</div>
+                                        <div class="metric-label">Temp</div>
+                                    </div>
+                                    <div class="metric-card text-center">
+                                        <div class="metric-value" id="cpuCoresCount">0</div>
+                                        <div class="metric-label">Cores</div>
+                                    </div>
+                                    <div class="metric-card text-center">
+                                        <div class="metric-value" id="cpuSpeed">0 MHz</div>
+                                        <div class="metric-label">Speed</div>
+                                    </div>
+                                </div>
+                                <div class="mt-3" id="cpuCoresList">
+                                    <!-- CPU cores will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Memory & Storage Row -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="content-panel">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="bi bi-memory"></i> Memory
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-4">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="mb-0">
+                                                    <i class="bi bi-ram me-1"></i> RAM
+                                                </h6>
+                                                <span class="badge bg-primary" id="ramPercent">0%</span>
+                                            </div>
+                                            <div class="progress mb-2">
+                                                <div id="ramProgress" class="progress-bar" role="progressbar"
+                                                    style="width: 0%"></div>
+                                            </div>
+                                            <div class="memory-details">
+                                                <div class="memory-stat">
+                                                    <div class="text-muted">Used</div>
+                                                    <div class="fw-bold" id="ramUsed">0 GB</div>
+                                                </div>
+                                                <div class="memory-stat">
+                                                    <div class="text-muted">Available</div>
+                                                    <div class="fw-bold text-success" id="ramAvailable">0 GB</div>
+                                                </div>
+                                                <div class="memory-stat">
+                                                    <div class="text-muted">Total</div>
+                                                    <div class="fw-bold" id="ramTotal">0 GB</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="mb-0">
+                                                    <i class="bi bi-hdd-stack me-1"></i> Swap
+                                                </h6>
+                                                <span class="badge bg-warning" id="swapPercent">0%</span>
+                                            </div>
+                                            <div class="progress mb-2">
+                                                <div id="swapProgress" class="progress-bar bg-warning"
+                                                    role="progressbar" style="width: 0%"></div>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <small id="swapUsed" class="text-muted">Used: 0 GB</small>
+                                                <small id="swapTotal" class="text-muted">Total: 0 GB</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="content-panel">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="bi bi-hdd-fill"></i> Storage
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="storageList">
+                                            <!-- Storage devices will be populated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Network Panel -->
+                    <div class="content-panel mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-wifi"></i> Network
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="network-tabs">
+                                    <ul class="nav nav-pills nav-justified mb-3" id="networkTabs" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="interfaces-tab" data-bs-toggle="pill"
+                                                data-bs-target="#interfaces" type="button"
+                                                role="tab">Interfaces</button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="stats-tab" data-bs-toggle="pill"
+                                                data-bs-target="#stats" type="button" role="tab">Stats</button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="connections-tab" data-bs-toggle="pill"
+                                                data-bs-target="#connections" type="button"
+                                                role="tab">Connections</button>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content" id="networkTabContent">
+                                        <div class="tab-pane fade show active" id="interfaces" role="tabpanel">
+                                            <div id="networkInterfaces">
+                                                <!-- Network interfaces will be populated here -->
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="stats" role="tabpanel">
+                                            <div id="networkStats">
+                                                <!-- Network stats will be populated here -->
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="connections" role="tabpanel">
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Protocol</th>
+                                                            <th>Local Address</th>
+                                                            <th>Remote Address</th>
+                                                            <th>State</th>
+                                                            <th>Process</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="connectionsList">
+                                                        <!-- Connections will be populated here -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Processes Panel -->
+                    <div class="content-panel mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-list-task"></i> Processes
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="process-overview">
+                                    <div class="metric-card text-center">
+                                        <div class="metric-value" id="processTotal">0</div>
+                                        <div class="metric-label">Total</div>
+                                    </div>
+                                    <div class="metric-card text-center">
+                                        <div class="metric-value text-success" id="processRunning">0</div>
+                                        <div class="metric-label">Running</div>
+                                    </div>
+                                    <div class="metric-card text-center">
+                                        <div class="metric-value text-info" id="processSleeping">0</div>
+                                        <div class="metric-label">Sleeping</div>
+                                    </div>
+                                    <div class="metric-card text-center">
+                                        <div class="metric-value text-danger" id="processZombie">0</div>
+                                        <div class="metric-label">Zombie</div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive mt-3">
+                                    <table class="table table-sm table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th><i class="bi bi-hash"></i> PID</th>
+                                                <th><i class="bi bi-app"></i> Name</th>
+                                                <th><i class="bi bi-cpu"></i> CPU %</th>
+                                                <th><i class="bi bi-memory"></i> Memory %</th>
+                                                <th><i class="bi bi-gear"></i> State</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="processList">
+                                            <!-- Processes will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Information Sidebar -->
+            <div class="col-lg-4">
+                <div class="sidebar-content">
+
+                    <div class="alert alert-info d-flex align-items-center mb-5">
+                        <span class="status-indicator status-online"></span>
+                        <i class="bi bi-info-circle me-2"></i>
+                        <span class="small">Last update: <span id="lastUpdate">Never</span></span>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-info-circle-fill"></i> System Information
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="system-info-list" id="systemInfo">
+                                <!-- System info will be populated here as a list -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-server"></i> Services
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="servicesList">
+                                <!-- Services will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-people"></i> Users
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="usersList">
+                                <!-- Users will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab-button" id="fabButton" data-bs-toggle="tooltip" data-bs-placement="left" title="Quick Actions">
+        <i class="bi bi-plus-lg" id="fabIcon"></i>
+    </button>
+
+    <!-- Quick Actions Menu -->
+    <div class="quick-actions mb-4 me-2" id="quickActions">
+        <a href="#" class="quick-action" id="refreshAction" data-bs-toggle="tooltip" data-bs-placement="left"
+            title="Force Refresh">
+            <i class="bi bi-arrow-clockwise"></i>
+        </a>
+        <a href="#" class="quick-action" id="fullscreenAction" data-bs-toggle="tooltip" data-bs-placement="left"
+            title="Toggle Fullscreen">
+            <i class="bi bi-fullscreen"></i>
+        </a>
+        <a href="#" class="quick-action" id="exportAction" data-bs-toggle="tooltip" data-bs-placement="left"
+            title="Export Data">
+            <i class="bi bi-download"></i>
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light mt-5">
+        <!-- Main Footer Content -->
+        <div class="py-5">
+            <div class="container">
+                <div class="row g-4">
+                    <!-- Brand Section -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="/assets/cpu.png" alt="CoreWatch Logo" class="img-fluid me-3" style="max-width: 50px;">
+                            <div>
+                                <h4 class="mb-0 fw-bold font-monospace">CoreWatch</h4>
+                                <small class="text-muted fst-italic">System monitoring reimagined</small>
+                            </div>
+                        </div>
+                        <p class="text-light-emphasis mb-3">
+                            Made with love, and a few console.log()s left behind.
+                        </p>
+                        
+                        <!-- Stats Cards -->
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <div class="card bg-primary bg-opacity-10 border-primary border-opacity-25 text-center p-2">
+                                    <div class="fw-bold text-primary small">Real-time</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">Monitoring</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="card bg-success bg-opacity-10 border-success border-opacity-25 text-center p-2">
+                                    <div class="fw-bold text-success small">100%</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">Open Source</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="card bg-info bg-opacity-10 border-info border-opacity-25 text-center p-2">
+                                    <div class="fw-bold text-info small">v<%= version %></div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">Current</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Links -->
+                    <div class="col-lg-4 col-md-6">
+                        <h6 class="text-light mb-3">
+                            <i class="bi bi-github me-2 text-primary"></i>Project
+                        </h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <a href="https://github.com/Harleythetech/CoreWatch" target="_blank" 
+                                   class="text-decoration-none text-light-emphasis d-flex align-items-center">
+                                    <i class="bi bi-code-slash me-2 text-muted"></i>
+                                    <span class="flex-grow-1">Repository</span>
+                                    <i class="bi bi-arrow-up-right small text-primary"></i>
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="https://github.com/Harleythetech/CoreWatch/issues" target="_blank" 
+                                   class="text-decoration-none text-light-emphasis d-flex align-items-center">
+                                    <i class="bi bi-bug me-2 text-muted"></i>
+                                    <span class="flex-grow-1">Report Issues</span>
+                                    <i class="bi bi-arrow-up-right small text-primary"></i>
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="https://github.com/Harleythetech/CoreWatch/pulls" target="_blank" 
+                                   class="text-decoration-none text-light-emphasis d-flex align-items-center">
+                                    <i class="bi bi-git me-2 text-muted"></i>
+                                    <span class="flex-grow-1">Contribute</span>
+                                    <i class="bi bi-arrow-up-right small text-primary"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Legal & Tech Stack -->
+                    <div class="col-lg-4 col-md-6">
+                        <h6 class="text-light mb-3">
+                            <i class="bi bi-shield-check me-2 text-primary"></i>Legal
+                        </h6>
+                        <ul class="list-unstyled mb-4">
+                            <li class="mb-2">
+                                <a href="https://github.com/Harleythetech/CoreWatch/blob/main/LICENSE" target="_blank" 
+                                   class="text-decoration-none text-light-emphasis d-flex align-items-center">
+                                    <i class="bi bi-file-earmark-text me-2 text-muted"></i>
+                                    <span class="flex-grow-1">AGPL-3.0 License</span>
+                                    <i class="bi bi-arrow-up-right small text-primary"></i>
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="https://github.com/Harleythetech/CoreWatch/security" target="_blank" 
+                                   class="text-decoration-none text-light-emphasis d-flex align-items-center">
+                                    <i class="bi bi-shield-lock me-2 text-muted"></i>
+                                    <span class="flex-grow-1">Security Policy</span>
+                                    <i class="bi bi-arrow-up-right small text-primary"></i>
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="https://github.com/Harleythetech" target="_blank" 
+                                   class="text-decoration-none text-light-emphasis d-flex align-items-center">
+                                    <i class="bi bi-person-circle me-2 text-muted"></i>
+                                    <span class="flex-grow-1">Developer</span>
+                                    <i class="bi bi-arrow-up-right small text-primary"></i>
+                                </a>
+                            </li>
+                        </ul>
+                        
+                        <!-- Tech Stack -->
+                        <div class="border-top border-secondary pt-3">
+                            <h6 class= mb-2 small">Built with</h6>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span class="badge text-bg-primary bg-opacity-75">Node.js</span>
+                                <span class="badge text-bg-success bg-opacity-75">Express</span>
+                                <span class="badge text-bg-info bg-opacity-75">Socket.io</span>
+                                <span class="badge text-bg-warning bg-opacity-75">Bootstrap</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer Bottom -->
+    <div class="bg-darker py-3 border-top border-secondary border-opacity-25">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0 text-muted small">
+                        © 2025 <span class="text-light fw-semibold">Harleythetech</span> • All rights reserved
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex justify-content-md-end align-items-center gap-3">
+                        <!-- Social Links -->
+                        <a href="https://github.com/Harleythetech" target="_blank" 
+                           class="text-muted text-decoration-none" data-bs-toggle="tooltip" title="GitHub">
+                            <i class="bi bi-github fs-5"></i>
+                        </a>
+                        
+                        <!-- Version Badge -->
+                        <span class="badge bg-secondary bg-opacity-50">
+                            <i class="bi bi-tag me-1"></i>v<%= version %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+
+</html>
