@@ -1,4 +1,7 @@
-# CoreWatch
+
+<p align="center"><img src="https://github.com/user-attachments/assets/e01328ef-b25d-4d03-8642-b219525a2fe9" width="200" height="200"></p>
+
+### <p align="center">CoreWatch - System monitoring reimagined</p>
 
 A comprehensive system monitor web GUI built with Node.js, Express, EJS, and Bootstrap. Monitor your system's performance in real-time through a responsive web interface.
 
@@ -63,9 +66,9 @@ CoreWatch/
 
 ## Configuration
 
-- **Port**: Default port is 3000. Set `PORT` environment variable to change:
+- **Port**: Default port is 3001. Set `PORT` environment variable to change:
   ```bash
-  PORT=8080 npm start
+  PORT=3001 npm star
   ```
 
 - **Update Interval**: Data refreshes every 5 seconds. Modify the interval in `index.js`:
