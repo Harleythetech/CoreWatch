@@ -1,33 +1,62 @@
-
 <p align="center"><img src="https://github.com/user-attachments/assets/e01328ef-b25d-4d03-8642-b219525a2fe9" width="200" height="200"></p>
 
 ### <p align="center">CoreWatch - System monitoring reimagined</p>
 
-A comprehensive system monitor web GUI built with Node.js, Express, EJS, and Bootstrap. Monitor your system's performance in real-time through a responsive web interface.
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.0.0--quantum-blue?style=for-the-badge" alt="Version">
+  <img src="https://img.shields.io/badge/Node.js-16+-green?style=for-the-badge&logo=node.js" alt="Node.js">
+  <img src="https://img.shields.io/badge/License-AGPL--3.0-red?style=for-the-badge" alt="License">
+  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey?style=for-the-badge" alt="Platform">
+</p>
 
-## Features
+A comprehensive, modern system monitoring web application built with Node.js, Express, EJS, and Bootstrap 5. Monitor your system's performance in real-time through a beautiful, responsive web interface with professional-grade features.
 
-- **Per-core CPU Usage & Frequencies**: Real-time monitoring of each CPU core with load percentages and current frequencies
-- **Memory Management**: RAM and swap usage with visual progress bars and detailed statistics
-- **CPU Temperature**: Live CPU temperature monitoring (when available)
-- **Storage Usage**: Monitor all mounted drives with usage statistics and available space
-- **Process Monitoring**: Top 15 processes by CPU usage with PID, name, CPU%, and memory%
-- **System Information**: Hostname, OS, kernel version, architecture, platform, and uptime
-- **Auto-refresh**: Data updates every 5 seconds automatically
-- **Responsive Design**: Bootstrap-based UI that works on desktop and mobile
-- **Dark/Light Mode**: Toggle between dark and light themes with persistent settings
-- **Real-time Updates**: Uses Socket.io for efficient real-time data streaming
+## ✨ Features
 
-## Technologies Used
+### 🖥️ **System Monitoring**
+- **Real-time CPU Metrics**: Per-core usage, frequencies, temperatures, and load averages
+- **Advanced Memory Management**: RAM, swap, cache, and buffer monitoring with detailed statistics
+- **Intelligent Storage Monitoring**: All mounted drives with usage analytics and filesystem details
+- **Process Management**: Top processes with CPU/memory usage, state monitoring, and PID tracking
+- **Network Intelligence**: Interface monitoring with IPv4/IPv6 support, statistics, and active connections
 
-- **Backend**: Node.js, Express.js
-- **Frontend**: EJS templating, Bootstrap 5, Socket.io
-- **System Info**: systeminformation library
-- **Icons**: Bootstrap Icons
+### 🎨 **Modern Interface**
+- **Responsive Design**: Bootstrap 5.3.0 with mobile-first approach
+- **Dark/Light Themes**: Seamless theme switching with persistent preferences
+- **Real-time Updates**: Socket.io powered live data streaming
+- **Interactive Dashboard**: Tabbed navigation, progress bars, and metric cards
+- **Professional UI**: Clean, modern design with Bootstrap Icons
 
-## Installation
+### 🔧 **Developer Features**
+- **Developer Service Filtering**: Focus on tech-relevant services (Node.js, Docker, PM2, databases)
+- **IPv6 Network Support**: Complete network interface monitoring including IPv6 addresses
+- **Dynamic Versioning**: Automatic version display from package.json
+- **Performance Optimized**: ARM device compatibility with fallback mechanisms
 
-1. **Clone or download** this repository to your local machine
+### 🚀 **Production Ready**
+- **PM2 Ecosystem**: Complete process management configuration
+- **Health Monitoring**: System status indicators and uptime tracking
+- **Logging System**: Structured logging with rotation support
+- **Quick Actions**: FAB menu with refresh, fullscreen, and export options
+
+## 🛠️ Technologies Used
+
+- **Backend**: Node.js 16+, Express.js 4.18+
+- **Frontend**: EJS templating, Bootstrap 5.3.0, Socket.io 4.7+
+- **System Monitoring**: systeminformation 5.21+
+- **Process Management**: PM2 5.3+
+- **Icons**: Bootstrap Icons 1.10+
+- **Development**: Nodemon for hot-reload
+
+## 📦 Installation
+
+### Quick Start
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Harleythetech/CoreWatch.git
+   cd CoreWatch
+   ```
 
 2. **Install dependencies**:
    ```bash
@@ -38,138 +67,273 @@ A comprehensive system monitor web GUI built with Node.js, Express, EJS, and Boo
    ```bash
    npm start
    ```
-   
-   Or for development with auto-restart:
-   ```bash
-   npm run dev
-   ```
 
 4. **Open your browser** and navigate to:
    ```
    http://localhost:3000
    ```
 
-## Project Structure
+### Development Mode
+
+For development with auto-restart:
+```bash
+npm run dev
+```
+
+### Production Deployment
+
+For production with PM2:
+```bash
+# Install PM2 globally
+npm install -g pm2
+
+# Start with PM2
+npm run pm2:start:prod
+
+# Monitor the application
+npm run pm2:monit
+```
+
+## 🏗️ Project Structure
 
 ```
 CoreWatch/
-├── index.js                 # Main server file
-├── package.json             # Project dependencies
+├── index.js                    # Main server with ASCII banner
+├── package.json                # Dependencies and PM2 scripts
+├── ecosystem.config.js         # PM2 configuration
+├── pm2-setup.sh/.ps1          # PM2 setup scripts
 ├── views/
-│   └── index.ejs           # Main template file
-└── public/
-    ├── css/
-    │   └── style.css       # Custom styles
-    └── js/
-        └── app.js          # Client-side JavaScript
+│   └── index.ejs              # Modern responsive template
+├── public/
+│   ├── css/
+│   │   └── style.css          # Enhanced custom styles
+│   ├── js/
+│   │   └── app.js             # Real-time frontend logic
+│   └── assets/
+│       ├── favicon.ico        # Favicon
+│       └── cpu.png           # Logo
+├── config/
+│   └── services.json         # Developer services configuration
+└── logs/                     # PM2 log directory
+    └── .gitkeep
 ```
 
-## Configuration
+## ⚙️ Configuration
 
-- **Port**: Default port is 3001. Set `PORT` environment variable to change:
-  ```bash
-  PORT=3001 npm star
-  ```
+### Environment Variables
 
-- **Update Interval**: Data refreshes every 5 seconds. Modify the interval in `index.js`:
-  ```javascript
-  // Change 5000 to desired milliseconds
-  }, 5000);
-  ```
+```bash
+# Server Configuration
+PORT=3001                      # Server port (default: 3001)
+NODE_ENV=production           # Environment mode
 
-## Browser Compatibility
+# CoreWatch Specific
+COREWATCH_UPDATE_INTERVAL=60000    # Update interval in ms (default: 1 minute)
+COREWATCH_MAX_PROCESSES=50         # Max processes to display
+COREWATCH_MAX_CONNECTIONS=100      # Max network connections to show
+```
 
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
+### PM2 Scripts
 
-## Features Overview
+```bash
+npm run pm2:start              # Start with default config
+npm run pm2:start:prod         # Start in production mode
+npm run pm2:start:dev          # Start with file watching
+npm run pm2:stop               # Stop the application
+npm run pm2:restart            # Restart the application
+npm run pm2:reload             # Zero-downtime reload
+npm run pm2:logs               # View logs
+npm run pm2:monit              # Open monitoring dashboard
+npm run pm2:status             # Check status
+```
 
-### CPU Monitoring
-- Individual core usage percentages
-- Core frequencies in MHz
-- Average CPU load
-- CPU temperature (when supported by hardware)
+### Service Filtering
 
-### Memory Monitoring
-- RAM usage with visual progress bars
-- Total, used, and free RAM in GB
-- Swap memory usage and statistics
-- Percentage-based usage indicators
+Configure developer-focused services in `config/services.json`:
+```json
+{
+  "development": ["node", "nodejs", "pm2", "docker"],
+  "databases": ["mysql", "postgresql", "mongodb", "redis"],
+  "webservers": ["nginx", "apache", "httpd"],
+  "media": ["plex", "jellyfin", "pihole"]
+}
+```
 
-### Storage Monitoring
-- All mounted filesystems
-- Usage percentages with color-coded progress bars
+## 🌐 Browser Compatibility
+
+- **Chrome**: 90+
+- **Firefox**: 88+
+- **Safari**: 14+
+- **Edge**: 90+
+- **Mobile**: iOS Safari 14+, Chrome Mobile 90+
+
+## 📊 Features Overview
+
+### 🔥 CPU Monitoring
+- Individual core usage with real-time percentages
+- Core frequencies and speed monitoring
+- CPU temperature tracking (hardware dependent)
+- Load averages and performance metrics
+- ARM device optimization
+
+### 💾 Memory Management
+- RAM usage with visual progress indicators
+- Swap memory monitoring and statistics
+- Cache and buffer memory tracking
+- Detailed memory breakdown in GB
+- Percentage-based usage with color coding
+
+### 💿 Storage Analytics
+- All mounted filesystems detection
+- Usage percentages with dynamic progress bars
 - Total, used, and available space in GB
-- Filesystem types
+- Filesystem type identification
+- Mount point information
 
-### Process Monitoring
-- Top 15 processes by CPU usage
-- Process ID (PID)
-- Process names
-- CPU usage percentages
-- Memory usage percentages
+### ⚡ Process Intelligence
+- Top processes by CPU and memory usage
+- Process state monitoring (running, sleeping, zombie)
+- PID tracking and process naming
+- Windows-specific process state handling
+- Real-time process statistics
 
-### System Information
-- Hostname
-- Operating system and distribution
-- Kernel version
-- System architecture
-- Platform information
-- System uptime
+### 🌐 Network Monitoring
+- Network interface detection (IPv4 + IPv6)
+- Interface statistics and operstate
+- Data transfer rates (RX/TX)
+- Active network connections
+- Protocol and port monitoring
 
-## Customization
+### 📋 System Information
+- Comprehensive system details
+- Hostname, OS, and kernel information
+- Architecture and platform detection
+- System uptime and boot time
+- User session monitoring
 
-### Themes
-The application supports dark and light modes. Users can toggle between themes using the switch in the navigation bar. The preference is saved in localStorage.
+### 🎛️ Service Management
+- Developer-focused service filtering
+- Service health monitoring
+- Running status and resource usage
+- Configurable service categories
+
+## 🎨 Customization
+
+### Theme System
+- **Dark Mode**: Professional dark theme with blue accents
+- **Light Mode**: Clean light theme with proper contrast
+- **Theme Persistence**: localStorage saves user preference
+- **Automatic Detection**: Respects system theme preference
+
+### UI Components
+- **Metric Cards**: Hover effects and smooth animations
+- **Progress Bars**: Color-coded based on usage levels
+- **Tables**: Responsive with Bootstrap styling
+- **Navigation**: Tab-based interface for different metrics
 
 ### Styling
-Modify `public/css/style.css` to customize the appearance. The application uses Bootstrap 5 variables and classes for easy theming.
+Customize appearance by modifying `public/css/style.css`:
+- CSS custom properties for easy theming
+- Bootstrap 5 utility classes
+- Responsive breakpoints
+- Custom animations and transitions
 
-### Data Sources
-The system information is gathered using the `systeminformation` library, which provides cross-platform system data for Windows, macOS, and Linux.
+## 🚨 Performance & Compatibility
 
-## Performance Notes
+### Optimization Features
+- **ARM Device Support**: Optimized for Raspberry Pi and similar devices
+- **Timeout Protection**: Prevents hanging on slow systems
+- **Fallback Mechanisms**: Minimal data mode for resource-constrained devices
+- **Efficient Updates**: Smart data collection with 1-minute intervals
+- **Memory Management**: Automatic restart at 1GB usage (PM2)
 
-- The application is optimized for minimal system impact
-- Data collection occurs server-side to reduce client load
-- Socket.io provides efficient real-time updates
-- Progress bars and animations use CSS transitions for smooth updates
+### System Requirements
+- **Node.js**: 16.0.0 or higher
+- **RAM**: 256MB minimum (512MB recommended)
+- **Storage**: 100MB for installation
+- **Network**: HTTP port access (default: 3001)
 
-## Troubleshooting
+## 🐛 Troubleshooting
 
 ### Common Issues
 
-1. **Permission errors on some system data**: Some system information may require elevated privileges on certain systems.
+1. **Permission Errors**
+   ```bash
+   # Linux/macOS: Run with appropriate permissions
+   sudo npm start
+   
+   # Windows: Run PowerShell as Administrator
+   ```
 
-2. **CPU temperature not showing**: CPU temperature monitoring depends on hardware sensors and may not be available on all systems.
+2. **CPU Temperature Not Available**
+   - Hardware/driver dependent feature
+   - Works best on Linux with proper sensor support
+   - Some ARM devices may require additional configuration
 
-3. **High memory usage**: The systeminformation library needs to access various system APIs, which may show higher memory usage in the process list.
+3. **High Memory Usage**
+   - Normal for system monitoring applications
+   - PM2 automatically restarts at 1GB usage
+   - Optimize by reducing update frequency
 
-### Dependencies
+4. **Network Interface Issues**
+   - Some virtual interfaces may not display correctly
+   - IPv6 support depends on system configuration
+   - Use `npm run pm2:logs` to debug network detection
 
-Make sure all npm dependencies are installed:
+### Debug Mode
+Enable detailed logging:
 ```bash
-npm install express ejs systeminformation socket.io
+NODE_ENV=development npm start
 ```
 
-For development:
+### PM2 Monitoring
+Monitor application health:
 ```bash
-npm install nodemon --save-dev
+pm2 monit          # Real-time monitoring
+pm2 logs corewatch # Application logs
+pm2 describe corewatch # Detailed process info
 ```
 
-## License
+## 📜 License
 
-MIT License - Feel free to modify and distribute as needed.
+**AGPL-3.0-only** - This project is licensed under the GNU Affero General Public License v3.0. See the LICENSE file for details.
 
-## Contributing
+## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+We welcome contributions! Please follow these steps:
 
-## Support
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
 
-For issues or questions, please check the troubleshooting section or create an issue in the repository.
+### Development Guidelines
+- Follow existing code style
+- Add comments for complex logic
+- Test on multiple platforms when possible
+- Update documentation for new features
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/Harleythetech/CoreWatch/issues)
+- **Security**: [Security Policy](https://github.com/Harleythetech/CoreWatch/security)
+- **Discussions**: [GitHub Discussions](https://github.com/Harleythetech/CoreWatch/discussions)
+
+## 🙏 Acknowledgments
+
+- **systeminformation**: Comprehensive system information library
+- **Bootstrap**: Modern responsive framework
+- **Socket.io**: Real-time communication
+- **PM2**: Production process management
+- **Node.js Community**: Excellent ecosystem support
+
+---
+
+<p align="center">
+  <strong>Made with ❤️ by <a href="https://github.com/Harleythetech">Harleythetech</a></strong>
+</p>
+
+<p align="center">
+  <em>System monitoring reimagined for the modern web</em>
+</p>
