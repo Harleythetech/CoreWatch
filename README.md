@@ -70,7 +70,7 @@ A comprehensive, modern system monitoring web application built with Node.js, Ex
 
 4. **Open your browser** and navigate to:
    ```
-   http://localhost:3000
+   http://localhost:3001
    ```
 
 ### Development Mode
